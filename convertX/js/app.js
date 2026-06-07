@@ -55,9 +55,45 @@ const App = {
       }
     }
 
-    // Load initial state
-    const lastCat = localStorage.getItem('convertx_lastCategory') || Settings.get().defaultCategory;
-    this.switchCategory(lastCat, false);
+    // Load initial state from URL or localStorage
+    let initialCat = localStorage.getItem('convertx_lastCategory') || Settings.get().defaultCategory;
+    let initialFrom = null;
+    let initialTo = null;
+
+    const path = window.location.pathname;
+    if (path && path.length > 1 && path !== '/index.html') {
+      const parts = path.split('/').filter(p => p);
+      if (parts.length >= 2) {
+        const catSlug = parts[0];
+        const unitSlugs = parts[1].split('-to-');
+        if (unitSlugs.length === 2) {
+          const parsedCat = Utils.fromSlug(catSlug, UnitData.categories);
+          if (parsedCat) {
+            initialCat = parsedCat;
+            const list = parsedCat === 'Currency' ? UnitData.currencyUnits : UnitData.units[parsedCat].list;
+            initialFrom = Utils.fromSlug(unitSlugs[0], list);
+            initialTo = Utils.fromSlug(unitSlugs[1], list);
+          }
+        }
+      }
+    }
+
+    this.switchCategory(initialCat, false);
+
+    // If URL had valid units, override the localStorage/defaults
+    if (initialFrom && initialTo) {
+      UI.setDropdownValues(initialFrom, initialTo);
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', (e) => {
+      if (e.state) {
+        this.loadConversion(e.state.category, e.state.fromUnit, e.state.toUnit, null, false);
+      } else {
+        // Fallback or navigate home
+        window.location.reload();
+      }
+    });
 
     // Initial lucide icons
     if(window.lucide) window.lucide.createIcons();
@@ -105,6 +141,9 @@ const App = {
 
     if (save) localStorage.setItem('convertx_lastCategory', category);
     
+    // Update URL to match initial dropdown values for this category
+    this.updateUrl(category, defaultFrom, defaultTo);
+    
     this.performConversion();
   },
 
@@ -142,7 +181,22 @@ const App = {
     localStorage.setItem(`convertx_lastFrom_${cat}`, from);
     localStorage.setItem(`convertx_lastTo_${cat}`, to);
     
+    this.updateUrl(cat, from, to);
     this.performConversion();
+  },
+
+  updateUrl(category, from, to) {
+    if (!category || !from || !to) return;
+    const catSlug = Utils.toSlug(category);
+    const fromSlug = Utils.toSlug(from);
+    const toSlug = Utils.toSlug(to);
+    
+    const newPath = `/${catSlug}/${fromSlug}-to-${toSlug}`;
+    
+    // Only push if it's actually a new path to avoid history spam
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({ category, fromUnit: from, toUnit: to }, '', newPath);
+    }
   },
 
   swapUnits() {

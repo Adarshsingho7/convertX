@@ -53,5 +53,24 @@ const Utils = {
     if (diffHour < 24) return `${diffHour} hr ago`;
     
     return date.toLocaleDateString();
+  },
+
+  // Convert name to URL friendly slug (e.g., "US Dollar" -> "us-dollar")
+  toSlug(name) {
+    if (!name) return '';
+    return name.toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special chars
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-'); // Remove duplicate hyphens
+  },
+
+  // Find original name from slug using a list of objects or strings
+  fromSlug(slug, list) {
+    if (!slug || !list) return null;
+    const match = list.find(item => {
+      const name = typeof item === 'string' ? item : (item.name || item.code);
+      return this.toSlug(name) === slug;
+    });
+    return match ? (typeof match === 'string' ? match : (match.name || match.code)) : null;
   }
 };

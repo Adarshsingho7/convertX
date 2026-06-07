@@ -165,3 +165,33 @@
     padding: var(--space-4);
   }
 }
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--border);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: var(--text-primary);
+}
+
+.footer-copyright {
+  color: var(--text-muted);
+  font-size: 12px;
+}
