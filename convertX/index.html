@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ConvertX — Fast Unit & Currency Converter</title>
+  <meta name="description" content="Convert units and currencies instantly. Length, weight, temperature, area, volume, speed, time, and 30+ live currencies. Free, fast, and ad-free.">
+  <meta name="keywords" content="unit converter, currency converter, length converter, weight converter, temperature converter, free converter">
+  <meta property="og:title" content="ConvertX — Fast Unit & Currency Converter">
+  <meta property="og:description" content="Convert anything instantly. Free, fast, student-friendly.">
+  <meta name="theme-color" content="#0F172A">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/main.css?v=15">
+  <link rel="stylesheet" href="css/layout.css?v=15">
+  <link rel="stylesheet" href="css/components.css?v=15">
+  <link rel="stylesheet" href="css/animations.css?v=15">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="top-bar-content">
+      <div class="logo">
+        <h1>ConvertX</h1>
+      </div>
+      <nav class="category-tabs" id="categoryTabs">
+        <button class="tab-btn active" data-category="Currency">Currency</button>
+        <button class="tab-btn" data-category="Length">Length</button>
+        <button class="tab-btn" data-category="Weight / Mass">Weight / Mass</button>
+        <button class="tab-btn" data-category="Temperature">Temperature</button>
+        <button class="tab-btn" data-category="Area">Area</button>
+        <button class="tab-btn" data-category="Volume">Volume</button>
+        <button class="tab-btn" data-category="Speed">Speed</button>
+        <button class="tab-btn" data-category="Time">Time</button>
+        <button class="tab-btn" data-category="Programmer Base">Programmer Base</button>
+
+        <button class="tab-btn" data-category="Smart Cooking">Smart Cooking</button>
+        <button class="tab-btn" data-category="Roman Numeral">Roman Numeral</button>
+        <button class="tab-btn" data-category="Time Zone">Time Zone</button>
+        <button class="tab-btn" data-category="Shoe Sizes">Shoe Sizes</button>
+      </nav>
+      <div class="header-actions" style="display: flex; align-items: center; gap: var(--space-3);">
+        <div id="offlineIndicator" class="offline-indicator hidden">
+          <i data-lucide="wifi-off" style="width: 16px; height: 16px;"></i>
+          <span>Offline</span>
+        </div>
+        <div class="theme-toggle">
+          <button class="icon-btn" id="themeToggleBtn" aria-label="Toggle Theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="page-layout">
+    <!-- Left Column: Converter Card -->
+    <section class="converter-section">
+    
+      <!-- Context Dropdown (Hidden by default, used for Cooking/Shoes) -->
+      <div class="context-select-container hidden" id="contextSelectContainer" style="margin-bottom: var(--space-4);">
+        <label for="contextValue" id="contextLabel" style="display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: var(--space-2); letter-spacing: 0.5px; text-transform: uppercase;">Sub-category</label>
+        <div class="custom-select-wrapper">
+          <select id="contextSelect" class="custom-dropdown-select" style="width: 100%; height: 52px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); padding: 0 var(--space-4); outline: none;">
+          </select>
+        </div>
+      </div>
+
+      <div class="converter-card" id="converterCard">
+        <!-- Input Top -->
+        <div class="input-group">
+          <label for="fromValue" id="fromLabel">From — USD</label>
+          <div class="custom-select-wrapper" id="fromSelectWrapper">
+            <button type="button" class="custom-select-trigger" id="fromSelectTrigger" aria-label="From Unit">
+              <span class="custom-select-value" id="fromSelectValue">USD</span>
+              <i data-lucide="chevron-down" class="select-icon"></i>
+            </button>
+            <div class="custom-select-dropdown hidden" id="fromSelectDropdown">
+              <div class="custom-select-search">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="fromSelectSearch" placeholder="Search..." autocomplete="off">
+              </div>
+              <div class="custom-select-options" id="fromSelectOptions"></div>
+            </div>
+          </div>
+          <div class="input-wrapper" style="position: relative;">
+            <input type="text" id="fromValue" class="value-input" placeholder="0" inputmode="decimal" autocomplete="off" style="padding-right: 40px;">
+            <button id="clearInputBtn" class="clear-input-btn" aria-label="Clear Input">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Swap Button -->
+        <div class="swap-wrapper">
+          <button class="swap-btn" id="swapBtn" aria-label="Swap units">
+            <i data-lucide="arrow-down-up"></i>
+          </button>
+        </div>
+
+        <!-- Output Bottom -->
+        <div class="input-group">
+          <label for="toValue" id="toLabel">To — EUR</label>
+          <div class="custom-select-wrapper" id="toSelectWrapper">
+            <button type="button" class="custom-select-trigger" id="toSelectTrigger" aria-label="To Unit">
+              <span class="custom-select-value" id="toSelectValue">EUR</span>
+              <i data-lucide="chevron-down" class="select-icon"></i>
+            </button>
+            <div class="custom-select-dropdown hidden" id="toSelectDropdown">
+              <div class="custom-select-search">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="toSelectSearch" placeholder="Search..." autocomplete="off">
+              </div>
+              <div class="custom-select-options" id="toSelectOptions"></div>
+            </div>
+          </div>
+          <div class="result-display-area">
+            <div class="result-content">
+              <span id="resultValue" class="result-number">0</span>
+              <span id="resultUnitName" class="result-unit-name">Euro</span>
+            </div>
+            <button class="icon-btn copy-btn" id="copyResultBtn" aria-label="Copy result">
+              <i data-lucide="copy" id="copyIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Rate Reference Info -->
+        <div class="rate-reference">
+          <span id="rateInfoText"></span>
+          <span id="rateTimestamp" class="rate-time"></span>
+        </div>
+        <div id="formulaDisplay" class="formula-display hidden">
+          <i data-lucide="function-square" class="formula-icon"></i>
+          <span id="formulaText"></span>
+        </div>
+        <div id="sparklineContainer" class="sparkline-container hidden"></div>
+      </div>
+      
+      <!-- Multi-Compare Section -->
+      <div id="multiCompareContainer" class="multi-compare-container">
+        <div class="multi-compare-header">
+          <h3>Compare To</h3>
+          <button id="addCompareBtn" class="icon-btn tooltip-trigger" aria-label="Add Currency">
+            <i data-lucide="plus"></i>
+          </button>
+        </div>
+        <div id="multiCompareList" class="multi-compare-list"></div>
+        
+        <!-- Hidden dropdown for multi-compare selection -->
+        <div id="compareSelectDropdown" class="custom-dropdown hidden" style="margin-top: 8px;">
+          <div class="custom-dropdown-search">
+            <i data-lucide="search"></i>
+            <input type="text" id="compareSelectSearch" placeholder="Search currency...">
+          </div>
+          <div id="compareSelectOptions" class="custom-dropdown-options"></div>
+        </div>
+      </div>
+      
+    </section>
+
+    <!-- Right Column: Sidebar (Desktop) / Collapsible (Mobile) -->
+    <aside class="sidebar-section">
+      <!-- Quick Reference -->
+      <div class="sidebar-card quick-ref-card">
+        <h3><i data-lucide="zap"></i> Quick Reference</h3>
+        <div class="sidebar-list" id="quickRefList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Recent Conversions -->
+      <div class="sidebar-card history-card">
+        <div class="card-header-flex">
+          <h3><i data-lucide="history"></i> Recent</h3>
+          <button class="ghost-btn" id="clearHistoryBtn">Clear</button>
+        </div>
+        <div class="sidebar-list" id="recentList">
+          <!-- Populated by JS -->
+          <div class="empty-state">No recent conversions.</div>
+        </div>
+      </div>
+
+      <!-- Favorites -->
+      <div class="sidebar-card favorites-card">
+        <div class="card-header-flex">
+          <h3><i data-lucide="star"></i> Favorites</h3>
+          <button class="icon-btn" id="addFavoriteBtn" aria-label="Add to favorites">
+            <i data-lucide="star" id="favoriteIcon"></i>
+          </button>
+        </div>
+        <div class="sidebar-list" id="favoritesList">
+          <!-- Populated by JS -->
+          <div class="empty-state">No favorites yet.</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Mobile Bottom Bar -->
+  <nav class="bottom-bar">
+    <button class="bottom-nav-btn active" data-target="converter">
+      <i data-lucide="home"></i>
+      <span>Converter</span>
+    </button>
+    <button class="bottom-nav-btn" data-target="history">
+      <i data-lucide="history"></i>
+      <span>History</span>
+    </button>
+    <button class="bottom-nav-btn" data-target="favorites">
+      <i data-lucide="star"></i>
+      <span>Favorites</span>
+    </button>
+    <button class="bottom-nav-btn" data-target="settings">
+      <i data-lucide="settings"></i>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Full Page Overlays (Mobile History/Favorites/Settings) -->
+  <div id="fullPageView" class="full-page-view hidden">
+    <div class="view-header">
+      <h2 id="viewTitle">Settings</h2>
+      <button class="icon-btn" id="closeViewBtn" aria-label="Close view">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="view-content" id="viewContent">
+        <!-- Settings Items -->
+        <div class="settings-group">
+          <div class="settings-item">
+            <div>
+              <div class="settings-item-title">App Theme</div>
+              <div class="settings-item-desc">Choose your preferred lighting</div>
+            </div>
+            <select id="themeSelect" class="custom-dropdown-select">
+              <option value="system">System Default</option>
+              <option value="dark">Dark Mode</option>
+              <option value="light">Light Mode</option>
+            </select>
+          </div>
+          
+          <div class="settings-item">
+            <div>
+              <div class="settings-item-title">Accent Color</div>
+              <div class="settings-item-desc">Personalize your app color</div>
+            </div>
+            <div class="color-picker" id="colorPicker">
+              <div class="color-swatch active" data-color="blue" style="background-color: #2563EB;"></div>
+              <div class="color-swatch" data-color="purple" style="background-color: #8B5CF6;"></div>
+              <div class="color-swatch" data-color="green" style="background-color: #10B981;"></div>
+              <div class="color-swatch" data-color="orange" style="background-color: #F97316;"></div>
+              <div class="color-swatch" data-color="red" style="background-color: #EF4444;"></div>
+            </div>
+          </div>
+        <div class="settings-group">
+          <label>Default Category</label>
+          <select id="defaultCategorySelect"></select>
+        </div>
+        <div class="settings-group">
+          <label>Decimal Places</label>
+          <select id="decimalPlacesSelect">
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+        <div class="settings-group">
+          <label>Number Format</label>
+          <select id="numberFormatSelect">
+            <option value="comma">1,000.00 (comma)</option>
+            <option value="period">1.000,00 (period)</option>
+            <option value="none">1000.00 (none)</option>
+          </select>
+        </div>
+        <div class="settings-group">
+          <label>Currency Updates</label>
+          <select id="currencyUpdateSelect">
+            <option value="1h">Every 1 hour</option>
+            <option value="6h">Every 6 hours</option>
+            <option value="manual">Manual only</option>
+          </select>
+        </div>
+        <button class="secondary-btn btn-danger" id="clearAllDataBtn">Clear All Data</button>
+      </div>
+
+      <!-- History Content (Mobile only) -->
+      <div id="historyContent" class="view-section hidden">
+        <div class="history-controls">
+          <input type="text" id="historySearch" placeholder="Search history..." class="search-input">
+          <button class="secondary-btn" id="exportHistoryBtn">Export CSV</button>
+        </div>
+        <div id="mobileHistoryList" class="full-list"></div>
+      </div>
+
+      <!-- Favorites Content (Mobile only) -->
+      <div id="favoritesContent" class="view-section hidden">
+        <div id="mobileFavoritesList" class="favorites-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js?v=15"></script>
+  <script src="js/units.js?v=15"></script>
+  <script src="js/currency.js?v=15"></script>
+  <script src="js/settings.js?v=15"></script>
+  <script src="js/history.js?v=15"></script>
+  <script src="js/favorites.js?v=15"></script>
+  <script src="js/converter.js?v=15"></script>
+  <script src="js/ui.js?v=15"></script>
+  <script src="js/app.js?v=15"></script>
+</body>
+</html>
